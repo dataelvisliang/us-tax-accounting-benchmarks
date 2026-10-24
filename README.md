@@ -83,6 +83,12 @@ Last verified: 2026-10-24. Status labels: `verified-downloadable`, `partial`, `n
 - **License:** a LICENSE file exists but GitHub reports it as unrecognized (NOASSERTION); read it before commercial use.
 - **Status:** `verified-downloadable`.
 
+### Harvey LAB, tax slice (Harvey)
+- **What:** Harvey's Legal Agent Bench is a legal agent benchmark organized into 27 practice areas; the **tax folder holds 34 tasks** of US tax lawyering: responses to IRS notices of deficiency and information document requests, closing agreement markups, a section 382 analysis review, a section 409A valuation review, transfer pricing documentation, a Tax Court petition, tax opinion and structure memoranda. Each task is a task.json (instructions, deliverables, PASS/FAIL criteria) plus a documents folder of real work files (this spot-checked task carries 10 files: docx summaries and an IRS notice, xlsx return schedules, an email chain), and the agent must produce a docx deliverable graded against the criteria.
+- **Download:** https://github.com/harveyai/harvey-labs (tax slice at tasks/tax)
+- **License:** MIT (repo).
+- **Status:** `verified-downloadable`. A slice of a larger legal benchmark, included under the rule that a US tax, accounting, or audit portion qualifies; the tax tasks are document-bearing, which most legal slices are not guaranteed to be, so check per task.
+
 ### Finch / FinWorkBench
 - **What:** Multi-step financial-accounting workflow tasks over real corporate file packs (modify spreadsheets, generate documents, answer questions), sourced mainly from Enron and EUSES corporate finance-and-accounting files. 172 workflows, 384 tasks.
 - **Download:** https://huggingface.co/datasets/FinWorkBench/Finch (evaluation code: https://github.com/FinWorkBench/Finch)
@@ -147,6 +153,26 @@ Last verified: 2026-10-24. Status labels: `verified-downloadable`, `partial`, `n
 - **FinBalance** (arXiv:2606.15949): multi-document accounting reconciliation with a deterministic generator (journal entries, balance sheets, 23 inconsistency codes; 710-item eval split). The paper states the generator and harness are Apache-2.0 and the generated records CC BY 4.0 with no hidden eval set, but the exact repository URL could not be extracted in this pass. **Unverified.**
 - **FinRule-Bench** (arXiv:2603.11339): financial statements plus accounting-principle rule-violation diagnosis (1,117 clean, 4,385 single-violation, 400 multi-violation records). The only release pointer is an anonymous review link that returns 401; no permanent GitHub or Hugging Face repo located. **Unverified.**
 
+### PRBench (Scale AI)
+- **What:** 1,100 expert-authored professional reasoning questions (Finance 600, Legal 500), each with a weighted expert rubric of 10 to 30 criteria. A topic field makes the tax and accounting questions countable: Legal Tax Law 17, Finance Tax and Estate Planning 1, Finance Accounting and Financial Reporting 1, for a **19-question tax/accounting theme pool**; there is no Audit topic.
+- **Download:** https://huggingface.co/datasets/ScaleAI/PRBench (CC BY 4.0, not gated)
+- **Status:** `partial`. Two limits: the set is global (114 countries, 47 US jurisdictions), so the 19 are a theme pool that still needs per-question US jurisdiction screening; and the form is dialogue plus rubric over a final answer, with no documents package and no file deliverables, so it is only partway to the Harvey LAB form.
+
+### MMLU professional_accounting (knowledge QA note)
+- **What:** The only accounting subject in MMLU: 282 test, 31 validation, 5 dev multiple-choice questions (318 total), US GAAP oriented. MMLU-Pro mixes accounting into a business category with no separate label, so no count is possible there.
+- **Download:** https://huggingface.co/datasets/cais/mmlu
+- **Status:** `partial`. Pure knowledge MCQs: no documents, no deliverables, no rubric. Recorded for the count only.
+
+## LAB-form sets checked: no countable US tax/accounting slice
+
+Sets built like Harvey LAB (one task package per item, work files, deliverables, expert rubrics) that were checked and found to contain no countable US tax, accounting, or audit slice. Recorded so the check does not have to be repeated.
+
+- **APEX-Agents v1** (https://huggingface.co/datasets/mercor/apex-agents, CC BY 4.0, gated with automatic approval): 480 tasks across 33 worlds averaging about 166 files each, prompt plus binary-criteria rubric plus expert gold output; the closest form match to LAB found. But the occupations are Investment Banking 160, Corporate Law 160, Management Consulting 160, with no Accounting, Tax, or Audit category and no countable tax sub-labels. Slice: **0**.
+- **APEX-Agents v1.1, Harbor edition** (https://huggingface.co/datasets/mercor/apex-agents-v1.1, CC BY 4.0, gated): 240 task folders counted, one folder per task with agent config, environment, verifier, and world image. A keyword scan of folder names for tax, account, audit, and bookkeep returns **0**.
+- **APEX-1 extended** (https://huggingface.co/datasets/mercor/APEX-v1-extended, CC BY 4.0, not gated): 100 of the 400 tasks are public, each with Domain, Prompt, Rubric JSON, and a File Attachments field, but only 11 of the 100 actually carry attachments. No official Tax or Accounting labels; a manual read of all 100 prompts found 3 tax-themed questions (private-wealth tax residency, estate tax with an S corp valuation, carried interest tax strategy in a real estate fund). Those 3 are a hand-picked candidate pool, not an official slice, and their jurisdictions and attachments are not individually confirmed.
+- **BigLaw Bench samples** (https://github.com/harveyai/biglaw-bench): Harvey's own earlier benchmark (often misattributed to Vals). The repo holds public samples only (a core sample CSV, litigation evidence PDFs, workflow and retrieval samples) from a 100-triplet 2024 set whose full data stays private. A scan of all 72 repo paths finds **0** tax paths; the derived JudgmentBench subset (30 tasks) has no tax category either.
+- **OfficeBench** (https://github.com/zlwang-cs/OfficeBench, Apache-2.0): 300 downloadable office tasks with real files (xlsx, eml, ics), but scoring is exact and fuzzy matching plus execution checks, not expert rubrics, and tasks are classified by how many apps they use, not by profession. No countable tax, accounting, or audit labels.
+
 ### FinMRAGBench (ACL 2026)
 - **What:** 887 expert-verified QA annotations over US 10-K annual report PDFs (723 filings, 96,549 pages, files named TICKER_10K_YEAR).
 - **Status:** `partial`. The annotations are in the GitHub repo https://github.com/sqyangit/FinMRAGBench (Apache-2.0), but the document corpus itself is not yet released; the README says the corpus and source list are coming "soon", so for now the PDFs must be rebuilt from EDGAR by hand. Half a set.
@@ -171,6 +197,8 @@ Last verified: 2026-10-24. Status labels: `verified-downloadable`, `partial`, `n
 | AuditFraudBench | Paper only (arXiv:2606.08345), fraud detection over SEC AAERs and original vs restated 10-K/10-Q filings | No code or data link in the paper or anywhere else found |
 | Rivet TaxBench | Vendor results page only (rivet.tax/taxbench) | No data download |
 | CPA exam question sets | Nothing legitimate found | Searches across Hugging Face, GitHub, Kaggle, and Zenodo surfaced only paid question-bank resellers (Docsity, Stuvia) with unverifiable provenance; no openly licensed AICPA released-question set exists as a dataset |
+| BigLaw Bench full set and BigLaw Bench: Research (Harvey) | Public samples, a blog, and a leaderboard | The full 100-triplet set is private (contact Harvey); the 2026 Research edition does list a Tax practice area but publishes no downloadable data |
+| Vals Legal Research Bench | Leaderboard page only, about 294 questions by practice area | No Tax, Accounting, or Audit category exists in it, and task data is not public |
 
 ## How entries get verified
 

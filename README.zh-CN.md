@@ -83,6 +83,12 @@
 - **许可证：** 仓库有 LICENSE 文件但 GitHub 标为未识别（NOASSERTION），商用前自行读原文确认。
 - **状态：** `已核实可下`。
 
+### Harvey LAB 的 tax 切片（Harvey）
+- **内容：** Harvey 的法律 agent 基准按 27 个执业领域分目录，其中 **tax 文件夹有 34 个任务**，全是美国税务律师的活：回复 IRS 欠税通知（notice of deficiency）与信息调取请求、closing agreement 修订稿、§382 分析复核、§409A 估值复核、转让定价文档、税务法院起诉书、税务意见函与架构备忘录。每个任务是一个 task.json（指令、交付物、PASS/FAIL 评分标准）加一个 documents 文件夹的真实工作文件（抽查的这道带 10 个文件：docx 摘要与 IRS 通知、xlsx 报税附表、邮件链），agent 要产出一份 docx 交付物按标准判分。
+- **下载：** https://github.com/harveyai/harvey-labs （tax 切片在 tasks/tax）
+- **许可证：** MIT（仓库）。
+- **状态：** `已核实可下`。属于大法律基准里切出来的一块，按「有美国税法、会计、审计内容就收」的口径收录；这批任务带文档文件，其他法律切片不保证带，逐题看。
+
 ### Finch / FinWorkBench
 - **内容：** 基于真实企业文件包的财务会计多步 workflow 任务（改表、生成文档、问答），源材料以 Enron 与 EUSES 企业财务会计文件为主。172 个 workflow、384 个任务。
 - **下载：** https://huggingface.co/datasets/FinWorkBench/Finch （评测代码：https://github.com/FinWorkBench/Finch ）
@@ -147,6 +153,26 @@
 - **FinBalance**（arXiv:2606.15949）：多文档会计对账，确定性生成器产出分录、资产负债表与 23 个不一致代码，评测 split 710 条。论文写明生成器与 harness 以 Apache-2.0 发布、生成记录以 CC BY 4.0 发布、无隐藏评测集，但确切仓库地址本轮没提取到。**未核实。**
 - **FinRule-Bench**（arXiv:2603.11339）：财报加会计原则的规则违规诊断（1,117 条干净记录、4,385 条单违规、400 条多违规）。论文给的只有匿名评审链接，打开返回 401；永久 GitHub/HF 仓库未定位到。**未核实。**
 
+### PRBench（Scale AI）
+- **内容：** 1,100 道专家撰写的专业推理题（Finance 600、Legal 500），每题带 10 到 30 条带权重的专家评分标准。带 topic 字段，税会题可以实际计数：Legal 的 Tax Law 17 题、Finance 的 Tax and Estate Planning 1 题、Finance 的 Accounting and Financial Reporting 1 题，合计 **19 题税会主题池**；没有 Audit 主题。
+- **下载：** https://huggingface.co/datasets/ScaleAI/PRBench （CC BY 4.0，非 gated）
+- **状态：** `部分可下`。两个限制：一，它是全球口径（114 个国家、47 个美国法域），19 题只是主题池，用前要逐题按法域筛美国的；二，形态是对话题加 rubric 判最终回复，没有文档包、没有文件交付物，只算部分接近 Harvey LAB 的形态。
+
+### MMLU professional_accounting（知识题备注）
+- **内容：** MMLU 里唯一的会计科目：test 282、validation 31、dev 5，共 318 道选择题，美国 GAAP 口径。MMLU-Pro 把会计混在 business 类目里没有独立标签，数不出来。
+- **下载：** https://huggingface.co/datasets/cais/mmlu
+- **状态：** `部分可下`。纯知识选择题：没文档、没交付物、没 rubric，只记录条数。
+
+## 查过的 LAB 形态集：没有可数的美国税会切片
+
+以下都是按 Harvey LAB 形态建的集（一题一个任务包、工作文件、交付物、专家 rubric），逐个查过，结论是切不出可数的美国税务、会计、审计任务。记下来免得重复查。
+
+- **APEX-Agents v1**（https://huggingface.co/datasets/mercor/apex-agents ，CC BY 4.0，gated 自动批准）：480 个任务、33 个 world（每个平均约 166 个文件），prompt 加二值 criteria rubric 加专家金标产出，是找到的与 LAB 形态最接近的。但职业只有 Investment Banking 160、Corporate Law 160、Management Consulting 160，没有 Accounting、Tax、Audit 类别，也没有可数的税务子标签。切片：**0**。
+- **APEX-Agents v1.1 Harbor 版**（https://huggingface.co/datasets/mercor/apex-agents-v1.1 ，CC BY 4.0，gated）：实际数到 240 个任务文件夹，一题一包（agent 配置、environment、verifier、world 镜像）。对文件夹名扫 tax、account、audit、bookkeep 关键词，结果 **0**。
+- **APEX-1 extended**（https://huggingface.co/datasets/mercor/APEX-v1-extended ，CC BY 4.0，非 gated）：母集 400 题公开 100 题，每题有 Domain、Prompt、Rubric JSON 和附件字段，但 100 题里只有 11 题真挂了附件。官方没有 Tax 或 Accounting 标签；人工逐条读完 100 题 prompt，挑出 3 道税务主题题（私人财富税务居民、遗产税加 S corp 估值、房地产基金 carried interest 税务策略）。这 3 道只能算人工候选池，不是官方切片，法域与附件也未逐题确认。
+- **BigLaw Bench 样本**（https://github.com/harveyai/biglaw-bench ）：这是 Harvey 自家的早期基准（常被误记为 Vals 的）。仓库只有公开样本（core 样本 CSV、诉讼证据 PDF、workflow 与 retrieval 样本），母集 100 个 triplet 的全量数据仍私有。扫全仓 72 条路径，tax 相关 **0**；其衍生子集 JudgmentBench（30 题）也没有税务类别。
+- **OfficeBench**（https://github.com/zlwang-cs/OfficeBench ，Apache-2.0）：300 个可下载的办公任务，带真实文件（xlsx、eml、ics），但判分是精确与模糊匹配加执行校验，不是专家 rubric；分类按用了几个应用，不按专业领域。没有可数的税务、会计、审计标签。
+
 ### FinMRAGBench（ACL 2026）
 - **内容：** 887 道专家核验 QA，语料是美国 10-K 年报原文 PDF（723 份、96,549 页，文件命名 TICKER_10K_YEAR）。
 - **状态：** `部分可下`。标注文件已在 GitHub 仓库 https://github.com/sqyangit/FinMRAGBench （Apache-2.0），但文档语料本身还没放：README 原话是年报语料和来源清单「soon」才发布，现阶段要自己按清单去 EDGAR 重建，算半套。
@@ -171,6 +197,8 @@
 | AuditFraudBench | 只有论文（arXiv:2606.08345），基于 SEC AAER 与原始/重述 10-K、10-Q 的欺诈识别 | 论文与各路检索均无代码或数据链接 |
 | Rivet TaxBench | 只有厂商结果页（rivet.tax/taxbench） | 无数据下载 |
 | CPA 考试题集 | 没找到合法开放的 | HF、GitHub、Kaggle、Zenodo 多路搜过，只有 Docsity、Stuvia 一类付费题库转卖站，来源与合法性不可验；不存在可合法开放下载的 AICPA 释放题数据集 |
+| BigLaw Bench 全集与 BigLaw Bench: Research（Harvey） | 公开样本、博客与排行榜 | 100 个 triplet 全集私有（要联系 Harvey）；2026 年的 Research 版 practice area 名单里确实有 Tax，但没有公开数据可下 |
+| Vals Legal Research Bench | 只有排行榜页，按 practice area 约 294 题 | 里面根本没有 Tax、Accounting、Audit 类别，任务数据也不公开 |
 
 ## 核查方法
 

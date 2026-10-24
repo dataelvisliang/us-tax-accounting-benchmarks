@@ -2,6 +2,8 @@
 
 A field log of public benchmarks for evaluating AI agents on US tax and accounting work, with one hard rule: **an entry is only listed as downloadable after its actual dataset or repository page has been opened and checked.** Press releases and leaderboard pages do not count.
 
+Scope rule: a set is included if it **contains US tax, accounting, or audit material**. Mixed sets qualify when a US portion exists, and the entry says so; sets with no US content are excluded.
+
 Last verified: 2026-10-24. Status labels: `verified-downloadable`, `partial`, `not-downloadable`.
 
 ## Verified downloadable
@@ -56,6 +58,37 @@ Last verified: 2026-10-24. Status labels: `verified-downloadable`, `partial`, `n
 - **License:** MIT
 - **Status:** `verified-downloadable`. Office-work realism rather than accounting depth.
 
+### SymageDocs Coherent Forms
+- **What:** One synthetic identity rendered consistently across three real US government forms: **IRS Form 1040 (2024, 2 pages)**, CMS-1500 health claim form, and USCIS Form I-9, with name, SSN, address, and employer linked across forms. 3,000 pages total (train 2,400, test 600, split by identity; roughly 428 identities, so the 1040 portion is about 850 pages by structure). Every page is a PNG image with FUNSD-style ground truth (word boxes, entity labels, key-value links). Fully synthetic, clean typed renders; the degraded scan-style version is the vendor's paid product.
+- **Download:** https://huggingface.co/datasets/Symage/coherent-forms-1040-cms1500-i9
+- **License:** SymageDocs Synthetic Dataset License v1.0: internal use allowed, including commercial training and evaluation; **no redistribution and no building competing datasets**. Gated on Hugging Face by click-agree plus sharing account info (auto-approved).
+- **Status:** `verified-downloadable`. One of the very few sets whose payload is filled US tax form documents themselves.
+
+### OfficeQA / OfficeQA Pro (Databricks)
+- **What:** Questions over the **original PDFs of U.S. Treasury Bulletins**, 697 issues from 1939 to 2025 (about 4 GB of PDFs, plus parsed JSON and transcript derivatives; the raw PDFs are in the package). OfficeQA Pro has 133 questions, the full version 246, each needing multi-step numerical reasoning across an average of 6.7 source bulletins. A separate gated Pro V2 expands the corpus to 1793 to 2024 at roughly 120k pages with 90 questions.
+- **Download:** https://huggingface.co/datasets/databricks/officeqa (code: https://github.com/databricks/officeqa)
+- **License:** data CC BY-SA 4.0, code Apache-2.0; the corpus itself is US government publication. Gated by click-agree on Hugging Face, including a promise not to train tested models on the answer key.
+- **Status:** `verified-downloadable`. Federal fiscal documents, adjacent to accounting rather than taxpayer tax forms; flagged as such.
+
+### Drew-IPP Invoice Extraction Benchmark
+- **What:** 181 real document files (113 text-layer PDFs, 53 JPEG phone and handwriting photos, 15 PNG scans, 220 pages total) with answer keys and a scorer, plus the generator. Fully synthetic, made by the vendor of InvoiceParser Pro (the card itself says it is not an independent benchmark); 10 of the original 191 documents were withheld for undisclosed types.
+- **US portion:** the clean subset of 31 mixes US, UK, EU, and South African formats; at least 20 clean-us documents are directly visible (USD, US sales tax with state and county lines, Net 30 terms). The publisher gives no exact per-country count and describes the mix as Southern African, UK, US, and EU conventions, so the entry records: US is a major component, exact count unpublished.
+- **Download:** https://huggingface.co/datasets/drew-ipp/invoice-extraction-benchmark (canonical repo with generator and scorer: https://github.com/DrewKraken/invoice-extraction-benchmark)
+- **License:** data CC BY 4.0, code MIT. No gate.
+- **Status:** `verified-downloadable`.
+
+### NAF (National Archives Forms)
+- **What:** Real historical US federal form scans from the National Archives and FamilySearch, many hand-filled: 860 images in v2 (train 708, validation 75, test 77) with field, text-box, relation, and transcription annotations. Government forms generally, not tax or accounting forms specifically; small, listed as a supplementary US forms source.
+- **Download:** https://github.com/herobd/NAF_dataset (labeled_images.tar.gz in GitHub Releases)
+- **License:** a LICENSE file exists but GitHub reports it as unrecognized (NOASSERTION); read it before commercial use.
+- **Status:** `verified-downloadable`.
+
+### Finch / FinWorkBench
+- **What:** Multi-step financial-accounting workflow tasks over real corporate file packs (modify spreadsheets, generate documents, answer questions), sourced mainly from Enron and EUSES corporate finance-and-accounting files. 172 workflows, 384 tasks.
+- **Download:** https://huggingface.co/datasets/FinWorkBench/Finch (evaluation code: https://github.com/FinWorkBench/Finch)
+- **License:** not stated on the dataset card or in the code repo (no LICENSE file); ask the authors before commercial use.
+- **Status:** `verified-downloadable`. Mixed provenance: the file packs include some Canadian and UK government material, so it is not purely US; filter before use.
+
 ### Snorkel FinQA (2026, not the 2021 FinQA)
 - **What:** An RL agent environment: the agent uses 4 MCP tools over real 10-K tables from 22 US listed companies (Alphabet, Amazon, Apple, and others) to find numbers, compute, and answer. 290 expert questions, binary reward.
 - **Download:** Open-sourced in the OpenEnv repository per Snorkel's 2026-03-30 post, with a Hugging Face Space to try online. Entry point: https://snorkel.ai/blog/building-finqa-an-open-rl-environment-for-financial-reasoning-agents/
@@ -96,6 +129,32 @@ Last verified: 2026-10-24. Status labels: `verified-downloadable`, `partial`, `n
 - **What:** 8 professional-finance task families, 5,448 test items (FinCode from CFA/CPA practice questions, SEC-Num from SEC filings, CodeFinQA, CodeTAT-QA, ConvFinQA Extract, TAT-QA Extract, FinKnow, FormulaEval). The paper states train, dev, and unlabeled test sets were released.
 - **Status:** `partial`. Content and size verified from the paper; the exact download URL was not located in this pass (one probed GitHub path returns 404). Listed so nobody has to rediscover the gap; link to be added when found.
 
+### Shelter Check (Can LLMs Identify Tax Abuse?)
+- **What:** Expert-designed tax shelter strategies; the model must judge whether each arrangement violates tax law (arXiv:2508.20097).
+- **Status:** `partial`. Only **5 of 36** strategies are public, in https://github.com/BlairStanek/LLM-Tax-Abuse; the authors deliberately withhold the rest (contamination and misuse concerns). The full set has been shared with IRS researchers, and qualified researchers can apply to the corresponding author under a data use agreement. No license file in the repo. Still, it is the only other public US tax-law reasoning resource found besides SARA.
+
+### AA-Omniscience-Public (Artificial Analysis)
+- **What:** A 600-row public sample of a domain knowledge question bank. The Accounting topic holds just **20 questions** (Accounting 13, Auditing 2, Taxation 5: GAAP/ASC, PCAOB, and IRS form knowledge).
+- **Download:** https://huggingface.co/datasets/ArtificialAnalysis/AA-Omniscience-Public
+- **License:** Apache-2.0 (stated on the card).
+- **Status:** `partial`. Tiny; a knowledge-question supplement, not a main eval set.
+
+### JHU Tax Law NLP Resources (corpus, not a benchmark)
+- **What:** The SARA team's underlying corpora: US Tax Court opinions and IRS private letter rulings, downloadable as zips (TaxCourtPLRCorpus.zip about 154 MB) from the Johns Hopkins data archive, DOI 10.7281/T1/N1X6I4, CC BY-NC 4.0.
+- **Status:** `partial`. Raw material for building your own tax eval items, not a scored benchmark.
+
+### FinBalance and FinRule-Bench (claimed released, URLs not pinned down)
+- **FinBalance** (arXiv:2606.15949): multi-document accounting reconciliation with a deterministic generator (journal entries, balance sheets, 23 inconsistency codes; 710-item eval split). The paper states the generator and harness are Apache-2.0 and the generated records CC BY 4.0 with no hidden eval set, but the exact repository URL could not be extracted in this pass. **Unverified.**
+- **FinRule-Bench** (arXiv:2603.11339): financial statements plus accounting-principle rule-violation diagnosis (1,117 clean, 4,385 single-violation, 400 multi-violation records). The only release pointer is an anonymous review link that returns 401; no permanent GitHub or Hugging Face repo located. **Unverified.**
+
+### FinMRAGBench (ACL 2026)
+- **What:** 887 expert-verified QA annotations over US 10-K annual report PDFs (723 filings, 96,549 pages, files named TICKER_10K_YEAR).
+- **Status:** `partial`. The annotations are in the GitHub repo https://github.com/sqyangit/FinMRAGBench (Apache-2.0), but the document corpus itself is not yet released; the README says the corpus and source list are coming "soon", so for now the PDFs must be rebuilt from EDGAR by hand. Half a set.
+
+### FinTabNet
+- **What:** 112k+ financial tables from S&P 500 annual reports, with structure annotations.
+- **Status:** `partial` and borderline under the documents rule: what ships is cropped table-region images cut from report pages, not the original report documents. Original via IBM's data exchange (https://developer.ibm.com/data/fintabnet/, IBM account and agreement required, CDLA-Permissive-1.0); a cleaned version, FinTabNet.c, is directly downloadable on Hugging Face (bsmock/FinTabNet.c, CDLA-Permissive-2.0).
+
 ## Checked and not downloadable
 
 | Benchmark | What exists publicly | Why it is not downloadable |
@@ -109,6 +168,9 @@ Last verified: 2026-10-24. Status labels: `verified-downloadable`, `partial`, `n
 | Basis internal eval suite | Described in an OpenAI case study (process plus outcome checks on real client-style work) | Vendor-internal; tasks, scoring outputs, and traces not public |
 | Vals TaxEval v2 | 20-question public validation set on request | 300-question validation set is licensed, 1,223-question test set is never shared per Vals |
 | Digits bookkeeping benchmark (2026) | Vendor announcement and report (2,000 real small-business transactions with US GAAP gold labels) | No data release found anywhere; press only |
+| AuditFraudBench | Paper only (arXiv:2606.08345), fraud detection over SEC AAERs and original vs restated 10-K/10-Q filings | No code or data link in the paper or anywhere else found |
+| Rivet TaxBench | Vendor results page only (rivet.tax/taxbench) | No data download |
+| CPA exam question sets | Nothing legitimate found | Searches across Hugging Face, GitHub, Kaggle, and Zenodo surfaced only paid question-bank resellers (Docsity, Stuvia) with unverifiable provenance; no openly licensed AICPA released-question set exists as a dataset |
 
 ## How entries get verified
 

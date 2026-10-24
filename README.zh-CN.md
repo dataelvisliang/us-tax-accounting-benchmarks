@@ -2,6 +2,8 @@
 
 一份实地核查日志：面向美国税务与会计工作的公开 AI agent 评测基准。规矩只有一条：**只有亲自打开过实际的数据集或仓库页面并核实，才标为可下载。** 新闻稿和排行榜页面不算数。
 
+收录口径：**只要含有美国税法、会计或审计内容就收**。混合集只要有美国部分即可入选，条目里会注明；完全没有美国内容的排除。
+
 最近核查：2026-10-24。状态标签：`已核实可下`、`部分可下`、`不可下`。
 
 ## 已核实可下载
@@ -56,6 +58,37 @@
 - **许可证：** MIT
 - **状态：** `已核实可下`。强在办公环境真实感，不在会计深度。
 
+### SymageDocs Coherent Forms
+- **内容：** 同一合成身份跨三张真实美国政府表格的成套渲染件：**IRS Form 1040（2024 版，2 页）**、CMS-1500 医保理赔表、USCIS Form I-9，姓名、SSN、地址、雇主在三表间一致连通。共 3,000 页（train 2,400 / test 600，按身份切分，约 428 个身份，1040 部分按结构推算约 850 页）。每页是 PNG 页面图，带 FUNSD 格式真值（词框、实体标签、键值链接）。全合成、干净打字渲染；扫描退化版是厂商的付费产品。
+- **下载：** https://huggingface.co/datasets/Symage/coherent-forms-1040-cms1500-i9
+- **许可证：** SymageDocs Synthetic Dataset License v1.0：可内部使用（含商业训练与评测），**禁止再分发、禁止用来造竞争数据集**。HF 上 gated，点选同意并共享账号信息即可（自动批准）。
+- **状态：** `已核实可下`。极少数以填好的美国税表文档本身为载荷的集之一。
+
+### OfficeQA / OfficeQA Pro（Databricks）
+- **内容：** 题目基于**美国财政部公报原始 PDF 整件**，697 期（1939 至 2025 年，PDF 约 4GB，另附解析 JSON 与转写文本衍生格式，原始 PDF 在包内）。Pro 版 133 题、Full 版 246 题，每题要跨平均 6.7 份公报做多步数值推理。另有单独 gated 的 Pro V2：语料扩至 1793 至 2024 年约 12 万页，90 题。
+- **下载：** https://huggingface.co/datasets/databricks/officeqa （代码：https://github.com/databricks/officeqa ）
+- **许可证：** 数据 CC BY-SA 4.0，代码 Apache-2.0；语料本身是美国政府出版物。HF 上点选同意（含承诺不用答案键训练受测模型）后可下。
+- **状态：** `已核实可下`。属联邦财政文档，是会计相邻口径，不是纳税人税表，已如实标注。
+
+### Drew-IPP 发票抽取基准
+- **内容：** 181 份真实文件（113 份带文字层 PDF、53 份 JPEG 手机拍与手写、15 份 PNG 扫描，共 220 页），带答案键、判分器和生成器。全合成，由 InvoiceParser Pro 的厂商自制（卡片明说不是独立基准）；原始 191 份扣下 10 份未公开类型。
+- **美国部分：** clean 子集 31 份是 US/UK/EU/ZA 格式混合，其中亲眼可见的 clean-us 文档至少 20 份（USD、美国销售税含州县两级税行、Net 30 条款）。发布方没有给按国家拆分的确切数字，自述为南非、英国、美国、欧盟约定混合，故记为：美国是主要构成之一，确切份数未公布。
+- **下载：** https://huggingface.co/datasets/drew-ipp/invoice-extraction-benchmark （canonical 仓库含生成器与判分器：https://github.com/DrewKraken/invoice-extraction-benchmark ）
+- **许可证：** 数据 CC BY 4.0，代码 MIT。无门槛。
+- **状态：** `已核实可下`。
+
+### NAF（National Archives Forms）
+- **内容：** 美国国家档案馆与 FamilySearch 提供的真实历史联邦表格扫描图，大量手写填写：v2 全量 860 张（train 708 / val 75 / test 77），带字段框、文本框、关系与转写标注。是政府表格，不是税务会计专用表，量级小，只作美国表格类的补充项。
+- **下载：** https://github.com/herobd/NAF_dataset （GitHub Release 里的 labeled_images.tar.gz）
+- **许可证：** 仓库有 LICENSE 文件但 GitHub 标为未识别（NOASSERTION），商用前自行读原文确认。
+- **状态：** `已核实可下`。
+
+### Finch / FinWorkBench
+- **内容：** 基于真实企业文件包的财务会计多步 workflow 任务（改表、生成文档、问答），源材料以 Enron 与 EUSES 企业财务会计文件为主。172 个 workflow、384 个任务。
+- **下载：** https://huggingface.co/datasets/FinWorkBench/Finch （评测代码：https://github.com/FinWorkBench/Finch ）
+- **许可证：** 数据卡与代码仓均未标注（仓内无 LICENSE 文件），商用前要问作者。
+- **状态：** `已核实可下`。材料里混有加拿大与英国政府机构件，不是纯美国口径，用前要筛。
+
 ### Snorkel FinQA（2026 新出，与 2021 年的 FinQA 不是一个东西）
 - **内容：** RL 智能体环境：agent 用 4 个 MCP 工具在 22 家美国上市公司（Alphabet、Amazon、Apple 等）的真实 10-K 数据表里查数、算数、交答案，二值奖励。290 道专家题。
 - **下载：** 据 Snorkel 2026-03-30 的博客，环境已在 OpenEnv 仓库开源，可克隆到本地下载数据运行，另有 Hugging Face Space 在线版。入口：https://snorkel.ai/blog/building-finqa-an-open-rl-environment-for-financial-reasoning-agents/
@@ -96,6 +129,32 @@
 - **内容：** 8 个专业财务任务族、测试集 5,448 条（FinCode 源自 CFA/CPA 练习题、SEC-Num 源自 SEC 文件、CodeFinQA、CodeTAT-QA、ConvFinQA Extract、TAT-QA Extract、FinKnow、FormulaEval）。论文明确说已发布 train、dev 和无标签 test 集。
 - **状态：** `部分可下`。内容与规模已按论文核实，但本轮多方搜索没能定位确切下载地址（试探的一个 GitHub 地址是 404），先把缺口如实记下，链接待补，不拿它充数。
 
+### Shelter Check（Can LLMs Identify Tax Abuse?）
+- **内容：** 专家设计的避税安排，让模型判断是否违反税法（arXiv:2508.20097）。
+- **状态：** `部分可下`。36 个策略只公开了 **5 个**，在 https://github.com/BlairStanek/LLM-Tax-Abuse ；其余作者故意不公开（防训练污染与滥用）。全集已与 IRS 研究者共享，合格研究者可签数据使用协议向通讯作者申请。仓库未见 LICENSE 文件。尽管如此，这是 SARA 之外唯一找到的另一个美国税法推理类公开资源。
+
+### AA-Omniscience-Public（Artificial Analysis）
+- **内容：** 领域知识题库的 600 行公开样本，其中 Accounting 主题只有 **20 题**（Accounting 13、Auditing 2、Taxation 5，内容是 GAAP/ASC、PCAOB、IRS 表格类知识题）。
+- **下载：** https://huggingface.co/datasets/ArtificialAnalysis/AA-Omniscience-Public
+- **许可证：** Apache-2.0（数据卡明示）。
+- **状态：** `部分可下`。量很小，只适合当知识题补充，不适合当主评测集。
+
+### JHU Tax Law NLP Resources（语料，不是评测集）
+- **内容：** SARA 团队的原始语料：美国税务法院判例与 IRS 私人信件裁定（PLR），zip 可下（TaxCourtPLRCorpus.zip 约 154MB），托管在约翰霍普金斯数据存档，DOI 10.7281/T1/N1X6I4，CC BY-NC 4.0。
+- **状态：** `部分可下`。是自建税务评测题的原材料，不是带评分的基准。
+
+### FinBalance 与 FinRule-Bench（声称已发布，地址未钉死）
+- **FinBalance**（arXiv:2606.15949）：多文档会计对账，确定性生成器产出分录、资产负债表与 23 个不一致代码，评测 split 710 条。论文写明生成器与 harness 以 Apache-2.0 发布、生成记录以 CC BY 4.0 发布、无隐藏评测集，但确切仓库地址本轮没提取到。**未核实。**
+- **FinRule-Bench**（arXiv:2603.11339）：财报加会计原则的规则违规诊断（1,117 条干净记录、4,385 条单违规、400 条多违规）。论文给的只有匿名评审链接，打开返回 401；永久 GitHub/HF 仓库未定位到。**未核实。**
+
+### FinMRAGBench（ACL 2026）
+- **内容：** 887 道专家核验 QA，语料是美国 10-K 年报原文 PDF（723 份、96,549 页，文件命名 TICKER_10K_YEAR）。
+- **状态：** `部分可下`。标注文件已在 GitHub 仓库 https://github.com/sqyangit/FinMRAGBench （Apache-2.0），但文档语料本身还没放：README 原话是年报语料和来源清单「soon」才发布，现阶段要自己按清单去 EDGAR 重建，算半套。
+
+### FinTabNet
+- **内容：** 标普 500 年报里的 112k+ 张财务表格，带结构标注。
+- **状态：** `部分可下`，且按带文档的严格标准只算边际符合：发行的只有从页面裁出的表格区域图加标注，没有年报整件。原版走 IBM 数据交换站 https://developer.ibm.com/data/fintabnet/ （需 IBM 账号与协议，CDLA-Permissive-1.0）；清洗版 FinTabNet.c 可在 HF 直下（bsmock/FinTabNet.c，CDLA-Permissive-2.0）。
+
 ## 已核查、不可下载
 
 | 基准 | 公开存在的只有 | 为什么下不了 |
@@ -109,6 +168,9 @@
 | Basis 内部评测 | OpenAI 案例里描述过（过程加结果的检查，基于真实客户式工作） | 厂商内部；题目、评分输出与轨迹均不公开 |
 | Vals TaxEval v2 | 20 题公开验证集（需向 Vals 申请） | 300 题验证集付费授权，1,223 题测试集官方称从不共享 |
 | Digits 记账基准（2026） | 只有厂商新闻稿与报告（2,000 笔真实小企业交易、US GAAP 金标） | 未找到任何数据下载发布 |
+| AuditFraudBench | 只有论文（arXiv:2606.08345），基于 SEC AAER 与原始/重述 10-K、10-Q 的欺诈识别 | 论文与各路检索均无代码或数据链接 |
+| Rivet TaxBench | 只有厂商结果页（rivet.tax/taxbench） | 无数据下载 |
+| CPA 考试题集 | 没找到合法开放的 | HF、GitHub、Kaggle、Zenodo 多路搜过，只有 Docsity、Stuvia 一类付费题库转卖站，来源与合法性不可验；不存在可合法开放下载的 AICPA 释放题数据集 |
 
 ## 核查方法
 

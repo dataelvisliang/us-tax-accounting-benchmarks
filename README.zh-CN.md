@@ -101,6 +101,11 @@
 - **许可证：** 本轮未核实到明确标注。
 - **状态：** `已核实可下`（按发布方口径），许可证待补。
 
+### 美国会计总账样本（Mindweave Technologies，印度）
+- **内容：** 一家模拟美国零售中小企业的完整复式记账总账，每笔分录借贷平衡。科目表带齐美国税项：FUTA、雇主 FICA、联邦和州所得税预扣、401(k)、销售税应付。免费样本实际行数：科目表 60 行、日记账分录 6,764 条、分录行 17,027 条、试算平衡表 380 行，合计 24,232 行 CSV。
+- **下载：** https://huggingface.co/datasets/mindweave/accounting-ledger-us （CC BY-NC 4.0，只能非商业；非 gated）。全量付费版在 Gumroad。
+- **状态：** `可下`，但定位要说清：这是结构化账簿数据，不是题库也不是带 rubric 的评测集。用途是做对账、试算平衡、分录生成评测的夹具和 ground truth。
+
 ## 部分可下与特殊许可证
 
 ### Vals AI Tax Agent Bench
@@ -149,6 +154,11 @@
 - **内容：** SARA 团队的原始语料：美国税务法院判例与 IRS 私人信件裁定（PLR），zip 可下（TaxCourtPLRCorpus.zip 约 154MB），托管在约翰霍普金斯数据存档，DOI 10.7281/T1/N1X6I4，CC BY-NC 4.0。
 - **状态：** `部分可下`。是自建税务评测题的原材料，不是带评分的基准。
 
+### Bespoke NPO Taxonomies（IRS Form 1023-EZ 分类语料）
+- **内容：** 约 104,000 篇非营利组织使命陈述，来自 2017 至 2019 年 IRS Form 1023-EZ 批准记录，标注了免税目的代码与 NTEE 大类，用使命文本预测组织的免税类别；项目自带协议留出 20,000 篇做独立测试。作者 Francisco Santamarina，2021 年。
+- **下载：** Harvard Dataverse，CC0 1.0，未见登录墙。Step 01 预处理：https://doi.org/10.7910/DVN/BL6XLW （12 个文件，原始加清洗后的批准数据，整包 ZIP 184 MB）。Step 02 合并数据：https://doi.org/10.7910/DVN/EO2HIM （三个全量 CSV 各约 480 至 510 MB，整包 1.4 GB）。Step 03 分类：https://doi.org/10.7910/DVN/4GZJSK （语料 RData 输入加 66 个 bootstrap 结果文件，整包 132 MB）。
+- **状态：** `部分可下`。是带标签的语料加复现文件，不是打包好的评测基准，拿来当 eval 要自己切分和写判分。项目页：https://fjsantam.github.io/bespoke-npo-taxonomies/
+
 ### FinBalance 与 FinRule-Bench（声称已发布，地址未钉死）
 - **FinBalance**（arXiv:2606.15949）：多文档会计对账，确定性生成器产出分录、资产负债表与 23 个不一致代码，评测 split 710 条。论文写明生成器与 harness 以 Apache-2.0 发布、生成记录以 CC BY 4.0 发布、无隐藏评测集，但确切仓库地址本轮没提取到。**未核实。**
 - **FinRule-Bench**（arXiv:2603.11339）：财报加会计原则的规则违规诊断（1,117 条干净记录、4,385 条单违规、400 条多违规）。论文给的只有匿名评审链接，打开返回 401；永久 GitHub/HF 仓库未定位到。**未核实。**
@@ -172,6 +182,21 @@
 - **APEX-1 extended**（https://huggingface.co/datasets/mercor/APEX-v1-extended ，CC BY 4.0，非 gated）：母集 400 题公开 100 题，每题有 Domain、Prompt、Rubric JSON 和附件字段，但 100 题里只有 11 题真挂了附件。官方没有 Tax 或 Accounting 标签；人工逐条读完 100 题 prompt，挑出 3 道税务主题题（私人财富税务居民、遗产税加 S corp 估值、房地产基金 carried interest 税务策略）。这 3 道只能算人工候选池，不是官方切片，法域与附件也未逐题确认。
 - **BigLaw Bench 样本**（https://github.com/harveyai/biglaw-bench ）：这是 Harvey 自家的早期基准（常被误记为 Vals 的）。仓库只有公开样本（core 样本 CSV、诉讼证据 PDF、workflow 与 retrieval 样本），母集 100 个 triplet 的全量数据仍私有。扫全仓 72 条路径，tax 相关 **0**；其衍生子集 JudgmentBench（30 题）也没有税务类别。
 - **OfficeBench**（https://github.com/zlwang-cs/OfficeBench ，Apache-2.0）：300 个可下载的办公任务，带真实文件（xlsx、eml、ics），但判分是精确与模糊匹配加执行校验，不是专家 rubric；分类按用了几个应用，不按专业领域。没有可数的税务、会计、审计标签。
+
+### Fake W-2 数据集（合成表格加字段级真值）
+- **内容：** 2,000 张合成 W-2 表格图片加字段级 ground truth JSON（train 1,800、test 100、validation 100，约 310 MB），做文档抽取评测用。
+- **下载：** https://huggingface.co/datasets/singhsays/fake-w2-us-tax-form-dataset
+- **状态：** `部分可下`。HF 这份没标许可证；它是 Kaggle 一个数据集的镜像，Google 的 Document AI 教程引用原集时标的是 CC0。全是合成表格，测的是抽取不是税务推理。
+
+### Finipher US Tax Evidence
+- **内容：** 27,840 条合成标注的美国联邦税记录，任务是 checklist 决策加证据定位。
+- **下载：** https://huggingface.co/datasets/finipher/finipher-us-tax-evidence （CC BY 4.0，非 gated）
+- **状态：** `部分可下`。数据卡自己写明标签是 AI 标注、未经人工独立复核、没做过生产验收，在它上面跑出的分要先审计标签才能当真。
+
+### Eduyush EA Part 1 样题（只有网页）
+- **内容：** 印度 EA 培训站 Eduyush 公开的 21 道 Enrolled Agent Part 1（个人税）练习题，按 IRS 官方六个考试 domain 分组，每题带答案、解析和逐题法源（IRC 条款号加 IRS Publication 号）。15 道是站方原创，其余是逐字转载的 IRS 官方样题且明确标注，搬运题库基本不标出处，这家标了。口径是 2025 税年。
+- **下载：** https://eduyush.com/blogs/cima/enrolled-agent-exam-part-1-sample-questions （网页可读，没有 CSV 或 JSON 文件）
+- **状态：** `部分可下`。出处最干净，但只有 21 道且只有网页版；背后的 2,000 多道全量题库是 Surgent 付费内容，不算。
 
 ### FinMRAGBench（ACL 2026）
 - **内容：** 887 道专家核验 QA，语料是美国 10-K 年报原文 PDF（723 份、96,549 页，文件命名 TICKER_10K_YEAR）。
@@ -199,6 +224,7 @@
 | CPA 考试题集 | 没找到合法开放的 | HF、GitHub、Kaggle、Zenodo 多路搜过，只有 Docsity、Stuvia 一类付费题库转卖站，来源与合法性不可验；不存在可合法开放下载的 AICPA 释放题数据集 |
 | BigLaw Bench 全集与 BigLaw Bench: Research（Harvey） | 公开样本、博客与排行榜 | 100 个 triplet 全集私有（要联系 Harvey）；2026 年的 Research 版 practice area 名单里确实有 Tax，但没有公开数据可下 |
 | Vals Legal Research Bench | 只有排行榜页，按 practice area 约 294 题 | 里面根本没有 Tax、Accounting、Audit 类别，任务数据也不公开 |
+
 
 ## 核查方法
 

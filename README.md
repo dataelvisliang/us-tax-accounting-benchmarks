@@ -101,6 +101,11 @@ Last verified: 2026-10-24. Status labels: `verified-downloadable`, `partial`, `n
 - **License:** not confirmed in this pass.
 - **Status:** `verified-downloadable` per the publisher, license pending.
 
+### US accounting ledger sample (Mindweave Technologies, India)
+- **What:** A complete double-entry ledger for a simulated US retail SMB, with every entry balanced. The chart of accounts includes US tax lines (FUTA, employer FICA, federal and state withholding, 401(k), sales tax payable). The free sample holds a 60-row chart of accounts, 6,764 journal entries, 17,027 entry lines, and a 380-row trial balance, 24,232 rows of CSV in total.
+- **Download:** https://huggingface.co/datasets/mindweave/accounting-ledger-us (CC BY-NC 4.0, non-commercial only; not gated). A larger paid edition exists on Gumroad.
+- **Status:** `full`, with a positioning note: this is structured ledger data, not a question set or a rubric benchmark. Its use is as fixture and ground-truth material for reconciliation, trial-balance, and journal-entry generation evals.
+
 ## Partial and special-license access
 
 ### Vals AI Tax Agent Bench
@@ -149,6 +154,11 @@ Last verified: 2026-10-24. Status labels: `verified-downloadable`, `partial`, `n
 - **What:** The SARA team's underlying corpora: US Tax Court opinions and IRS private letter rulings, downloadable as zips (TaxCourtPLRCorpus.zip about 154 MB) from the Johns Hopkins data archive, DOI 10.7281/T1/N1X6I4, CC BY-NC 4.0.
 - **Status:** `partial`. Raw material for building your own tax eval items, not a scored benchmark.
 
+### Bespoke NPO Taxonomies (IRS Form 1023-EZ classification corpus)
+- **What:** About 104,000 nonprofit mission statements from IRS Form 1023-EZ approvals (2017 to 2019), labeled with exemption-purpose codes and NTEE major groups, built to predict an organization's tax-exempt category from its mission text. The project's own protocol holds out a 20,000-document test set. Author: Francisco Santamarina, 2021.
+- **Download:** Harvard Dataverse, CC0 1.0, no login wall observed. Step 01 preprocessing: https://doi.org/10.7910/DVN/BL6XLW (12 files, source plus cleaned approvals, ZIP 184 MB). Step 02 merged data: https://doi.org/10.7910/DVN/EO2HIM (three full-data CSVs of about 480 to 510 MB each, ZIP 1.4 GB). Step 03 classification: https://doi.org/10.7910/DVN/4GZJSK (corpus .RData inputs plus 66 bootstrap result files, ZIP 132 MB).
+- **Status:** `partial`. A labeled corpus with replication files, not a packaged benchmark; anyone using it as an eval has to build the split and scorer themselves. Project page: https://fjsantam.github.io/bespoke-npo-taxonomies/
+
 ### FinBalance and FinRule-Bench (claimed released, URLs not pinned down)
 - **FinBalance** (arXiv:2606.15949): multi-document accounting reconciliation with a deterministic generator (journal entries, balance sheets, 23 inconsistency codes; 710-item eval split). The paper states the generator and harness are Apache-2.0 and the generated records CC BY 4.0 with no hidden eval set, but the exact repository URL could not be extracted in this pass. **Unverified.**
 - **FinRule-Bench** (arXiv:2603.11339): financial statements plus accounting-principle rule-violation diagnosis (1,117 clean, 4,385 single-violation, 400 multi-violation records). The only release pointer is an anonymous review link that returns 401; no permanent GitHub or Hugging Face repo located. **Unverified.**
@@ -172,6 +182,21 @@ Sets built like Harvey LAB (one task package per item, work files, deliverables,
 - **APEX-1 extended** (https://huggingface.co/datasets/mercor/APEX-v1-extended, CC BY 4.0, not gated): 100 of the 400 tasks are public, each with Domain, Prompt, Rubric JSON, and a File Attachments field, but only 11 of the 100 actually carry attachments. No official Tax or Accounting labels; a manual read of all 100 prompts found 3 tax-themed questions (private-wealth tax residency, estate tax with an S corp valuation, carried interest tax strategy in a real estate fund). Those 3 are a hand-picked candidate pool, not an official slice, and their jurisdictions and attachments are not individually confirmed.
 - **BigLaw Bench samples** (https://github.com/harveyai/biglaw-bench): Harvey's own earlier benchmark (often misattributed to Vals). The repo holds public samples only (a core sample CSV, litigation evidence PDFs, workflow and retrieval samples) from a 100-triplet 2024 set whose full data stays private. A scan of all 72 repo paths finds **0** tax paths; the derived JudgmentBench subset (30 tasks) has no tax category either.
 - **OfficeBench** (https://github.com/zlwang-cs/OfficeBench, Apache-2.0): 300 downloadable office tasks with real files (xlsx, eml, ics), but scoring is exact and fuzzy matching plus execution checks, not expert rubrics, and tasks are classified by how many apps they use, not by profession. No countable tax, accounting, or audit labels.
+
+### Fake W-2 dataset (synthetic forms with field-level ground truth)
+- **What:** 2,000 synthetic W-2 form images with field-level ground-truth JSON (1,800 train, 100 test, 100 validation, about 310 MB), for document extraction evals.
+- **Download:** https://huggingface.co/datasets/singhsays/fake-w2-us-tax-form-dataset
+- **Status:** `partial`. The HF copy carries no license field; it mirrors a Kaggle dataset that Google's Document AI tutorial cites as CC0. Fully synthetic forms, so it tests extraction, not tax reasoning.
+
+### Finipher US Tax Evidence
+- **What:** 27,840 synthetic, annotated US federal tax records framed as checklist decisions plus evidence localization.
+- **Download:** https://huggingface.co/datasets/finipher/finipher-us-tax-evidence (CC BY 4.0, not gated)
+- **Status:** `partial`. The card itself states the labels were produced by an AI annotator with no independent human review and no production acceptance testing, so treat scores on it as unverified until the labels are audited.
+
+### Eduyush EA Part 1 sample questions (web only)
+- **What:** 21 Enrolled Agent Part 1 (individual tax) practice questions published on an Indian EA training site, grouped by the IRS's six exam domains, each with an answer, an explanation, and pinpoint sources (IRC section plus IRS Publication). 15 are the site's own writing; the rest are verbatim IRS sample questions labeled as such, a provenance discipline scraped question banks almost never show. Law as of tax year 2025.
+- **Download:** https://eduyush.com/blogs/cima/enrolled-agent-exam-part-1-sample-questions (readable web page; no CSV or JSON file)
+- **Status:** `partial`. Clean provenance but tiny, and web-only. The full 2,000+ question bank behind it is paid Surgent material and does not count.
 
 ### FinMRAGBench (ACL 2026)
 - **What:** 887 expert-verified QA annotations over US 10-K annual report PDFs (723 filings, 96,549 pages, files named TICKER_10K_YEAR).
@@ -199,6 +224,7 @@ Sets built like Harvey LAB (one task package per item, work files, deliverables,
 | CPA exam question sets | Nothing legitimate found | Searches across Hugging Face, GitHub, Kaggle, and Zenodo surfaced only paid question-bank resellers (Docsity, Stuvia) with unverifiable provenance; no openly licensed AICPA released-question set exists as a dataset |
 | BigLaw Bench full set and BigLaw Bench: Research (Harvey) | Public samples, a blog, and a leaderboard | The full 100-triplet set is private (contact Harvey); the 2026 Research edition does list a Tax practice area but publishes no downloadable data |
 | Vals Legal Research Bench | Leaderboard page only, about 294 questions by practice area | No Tax, Accounting, or Audit category exists in it, and task data is not public |
+
 
 ## How entries get verified
 

@@ -2,7 +2,7 @@
 
 一份实地核查日志：面向美国税务与会计工作的公开 AI agent 评测基准。规矩只有一条：**只有亲自打开过实际的数据集或仓库页面并核实，才标为可下载。** 新闻稿和排行榜页面不算数。
 
-收录口径：**只要含有美国税法、会计或审计内容就收**。混合集只要有美国部分即可入选，条目里会注明；完全没有美国内容的排除。
+收录口径：**只要含有美国税法、会计或审计内容就收**。混合集只要有美国部分即可入选，条目里会注明；完全没有美国内容的排除。后文另设一节记录原始物料与开源税务引擎：官方批量数据、学术语料和微观模拟代码，它们安安静静地充当着夹具与标准答案的基础设施。
 
 最近核查：2026-10-24。状态标签：`已核实可下`、`部分可下`、`不可下`。
 
@@ -206,6 +206,107 @@
 - **内容：** 标普 500 年报里的 112k+ 张财务表格，带结构标注。
 - **状态：** `部分可下`，且按带文档的严格标准只算边际符合：发行的只有从页面裁出的表格区域图加标注，没有年报整件。原版走 IBM 数据交换站 https://developer.ibm.com/data/fintabnet/ （需 IBM 账号与协议，CDLA-Permissive-1.0）；清洗版 FinTabNet.c 可在 HF 直下（bsmock/FinTabNet.c，CDLA-Permissive-2.0）。
 
+## 原始物料与开源引擎（静悄悄的基础设施）
+
+这些不是评测基准，而是造夹具和标准答案要用的批量数据、语料和计算引擎。每个都在源头页面当面核实过。
+
+### IRS Form 990 全量电子申报 XML（IRS）
+- **内容：** 2011 年以来全部电子申报的 Form 990、990-EZ、990-PF 及附表，一份申报一个 XML，共数百万份，按月增量。捐赠人信息不在内，部分身份识别号已脱敏。早年的 AWS 公开桶已于 2021 年底弃用，现行主渠道是 IRS 官网下载页。
+- **下载：** https://www.irs.gov/charities-non-profits/form-990-series-downloads
+- **状态：** `已核实可下`。依据税法 6104 条法定公开，无注册无协议。非营利组织财报与治理字段的 ground truth 全集。
+
+### IRS EO BMF（免税组织主文件摘录）
+- **内容：** 全美免税组织的主索引，2026 年 10 月 13 日发布版共 1,975,975 条记录，CSV 按州拆分加区域与国际文件。字段含 EIN、法定名与 DBA、501(c) 子类与分类代码、裁定年份、资产与收入代码、申报要求、基金会状态等。
+- **下载：** https://www.irs.gov/charities-non-profits/exempt-organizations-business-master-file-extract-eo-bmf
+- **状态：** `已核实可下`。免费，约每月更新的累积快照。是 990 数据的抽样框和勾连键表。
+
+### IRS SOI（含合成 PUF）
+- **内容：** 三层门槛完全不同。聚合统计表（个人、公司、免税、遗产税、ZIP 与县级）免费直下；个人传统 Public Use File **已下架**，替代的全合成 Synthetic PUF（2016 税年，与 Urban Institute 和 Tax Policy Center 合作）已于 2025 年 11 月 21 日发布，但确切下载页本轮未钉死；免税组织 SOI 抽样微观数据（1985 至 2022，ASCII）仍免费可下。
+- **下载：** https://www.irs.gov/statistics
+- **状态：** `部分可下`。聚合表与免税微观数据已核实可下；合成 PUF 的发布经 IRS 公告确认，落页待补钉。
+
+### SEC 财报数据包与 EDGAR 批量文件
+- **内容：** 按原始申报口径的结构化 XBRL 财务数据：季度 ZIP 从 2009 年一季度到 2026 年三季度（每包约 60 至 122 MB），含申报、数值、标签、列示四张表，另有带附注文本的版本；每夜重编的批量包有全部公司 facts（companyfacts.zip）和全部申报人历史（submissions.zip）。JSON API 不要 key，全文检索覆盖 2001 年以来申报。
+- **下载：** https://www.sec.gov/dera/data/financial-statement-data-sets.html
+- **状态：** `已核实可下`。美国政府公共领域；程序化访问须守 SEC fair access（User-Agent 带身份、每秒不超过 10 次）。上市公司财报数字最扎实的官方 ground truth。
+
+### Federal Audit Clearinghouse（GSA）
+- **内容：** 美国 Single Audit 的结构化汇集，每年 4 万多份、回溯到 1997 年，审计发现、重大缺陷、质疑成本、整改计划全是现成字段。是审计方向与 990 语料对应的正主。
+- **下载：** https://www.fac.gov ，API 在 https://api.fac.gov
+- **状态：** `已核实可下`。网页检索免 key，API 要一个免费的 api.data.gov key。
+
+### Treasury Fiscal Data（财政部）
+- **内容：** 联邦收支官方时间序列，含 Monthly Treasury Statement（按来源分个人、公司、就业税等收入，回溯到 1980 年 10 月）与 Daily Treasury Statement。
+- **下载：** https://fiscaldata.treasury.gov （API 不要 key）
+- **状态：** `已核实可下`。公共领域。宏观税务数字的 ground truth。
+
+### NCCS Core Files（Urban Institute）与 ProPublica Nonprofit Explorer
+- **内容：** 两条清洗好的 990 数据路线。NCCS Core Files 把 IRS 申报流水整合成面板，每家组织 60 多个财务字段，覆盖自 1989 年（ODC-BY，须署名；历史文件止于 2010 年代中期，近年要靠 IRS 原始 XML 接续）。ProPublica 覆盖约 190 万家组织、1,800 万份申报，免费免 key API 加结构化摘录、PDF、XML 的批量下载。
+- **下载：** https://datacatalog.urban.org/dataset/national-center-charitable-statistics-nccs-core-files ，https://projects.propublica.org/nonprofits/
+- **状态：** `已核实可下`。ProPublica 的批量文件名本轮是多源交叉确认而非逐个点开，其 API 条款已确认。
+
+### 人口普查局州政府税收统计
+- **内容：** 50 个州政府按 25 个税种的年度征收额，XLS 与 CSV 回溯到 1951 年，另有 API 时间序列。
+- **下载：** https://www.census.gov/programs-surveys/stc/data.html
+- **状态：** `已核实可下`。API 要免费 Census key。州级税务统计的官方口径源。
+
+### FiNER-139（XBRL 数字实体标注）
+- **内容：** 约 1 万份 SEC 申报（2016 至 2020）、111 万句、139 个最常用 US GAAP XBRL 标签的词级标注，带 train、validation、test 切分。
+- **下载：** https://huggingface.co/datasets/nlpaueb/finer-139 （CC BY-SA 4.0，非 gated）
+- **状态：** `已核实可下`。
+
+### FNXL（金融数字极端标注）
+- **内容：** 79,088 句、142,922 个被标注数字、2,794 个 US GAAP 标签、840 家公司，按公司切分防泄漏。
+- **下载：** https://huggingface.co/datasets/soummyaah/FNXL （非 gated）
+- **状态：** `部分可下`。HF 与 GitHub 两边都没标许可证，真要用之前先想清授权。
+
+### EDGAR-CORPUS（10-K 全量语料）
+- **内容：** 1993 至 2020 年全部 10-K，共 38,009 份、约 65 亿 token，JSON 且已按 10-K 的 20 个 Item 切好章节，按年份打包共约 10.9 GB。
+- **下载：** https://doi.org/10.5281/zenodo.5528490 （CC BY 4.0）
+- **状态：** `已核实可下`。配套抓取工具在 github.com/nlpaueb/edgar-crawler。
+
+### MAEC（财报电话会语料）
+- **内容：** 3,443 场电话会、1,213 家标普 1500 公司（2015 至 2018），转录与音频句级对齐。仓库内是转录加低层音频特征共 147.7 MB；高层 MFCC 特征 59 GB 走 Google Drive；原始音频不在仓库。
+- **下载：** https://github.com/Earnings-Call-Dataset/MAEC （CC BY-SA 4.0）
+- **状态：** `已核实可下`（仓库内部分）。
+
+### Harvard Dataverse 的安静沉淀（全部 CC0）
+- **SEC Financial as Reported**（https://doi.org/10.7910/DVN/REP5DJ ）：20 个季度 JSON 共约 1.02 GB，2010 年一季度起，as reported 口径财报数据。
+- **10-K Item 1 的 MPNet 嵌入**（https://doi.org/10.7910/DVN/Y79OCK ）：1994 至 2022 年全部 10-K 业务描述部分的现成向量，索引 14 MB 加嵌入包 1.88 GB，共约 1.94 GB，做 10-K 文本实验可省掉自算嵌入一步。
+- **Accounting Fraud**（https://doi.org/10.7910/DVN/5KLEXO ）：表格加 MATLAB 的 CNN、LSTM 舞弊检测代码，共 62.8 MB。文件清单已核实，样本构成没逐行看，引用前先打开表。
+- 两件小的：审计特征与舞弊嫌疑财报数据库（https://doi.org/10.7910/DVN/ACLNK7 ，845 KB）；审计委员会与财务困境数据（https://doi.org/10.7910/DVN/XRKASF ，19 KB）。
+- **状态：** `已核实可下`。结构性提醒：Dataverse 上多数税务沉淀是只有代码的复现包，底层 IRS 或 Compustat 数据受限、不随包发布。
+
+### 美国州与地方税率 1975-2022（ICPSR）
+- **内容：** 州税率 1977 至 2022、地方税率聚合到县级 2000 至 2022，覆盖个人所得税、公司税、财产税、销售税、消费税，来源含 NBER TaxSim 与各州税务机关。
+- **下载：** https://doi.org/10.3886/E208462V2 （CC BY 4.0，Public）
+- **状态：** `部分可下`。ICPSR 公开集也要先注册免费账号（Researcher Passport）才能下。ICPSR 的会计与审计沉淀基本为空，有分量的就这一套。
+
+### Loughran-McDonald 词典与顶刊复现说明
+- **内容：** Loughran-McDonald 主词典（圣母大学 SRAF 站，2026 年 3 月更新到 1993 至 2025 版）是会计金融文本分析的事实标准词典，词源是全量 EDGAR 10-K，CSV 与 XLSX 直下。条款：学术免费，商用要单独授权。另，Journal of Accounting Research 有中央补充材料页，但条款限定仅学术研究、商业使用严格禁止，且多是代码与识别符而非数据本体。
+- **下载：** https://sraf.nd.edu/loughranmcdonald-master-dictionary/
+- **状态：** `部分可下`。是研究工具，因会计文本评测总会用到而记录，用时注意非商业条款。
+
+### PSL Tax-Calculator
+- **内容：** 华盛顿政策圈的开源联邦个人所得税加工资税静态微观模拟模型，CRS、AEI、Tax Policy Center 都在用。代码在美国属公共领域（GitHub 识别为 Other）。
+- **下载：** https://github.com/PSLmodels/Tax-Calculator （314 star，活跃维护）
+- **状态：** `部分可下`，卡点在数据分三层：自带的 CPS 文件（公开人口普查数据加工，作者自己注明精度有限）随包分发、零门槛可跑；高精度 PUF 文件要自备向 IRS SOI 取得的 2011 年 PUF 再加工，新一代 TMD 同理要 2015 年 PUF，成品均不许再分发。其数据流水线在 github.com/PSLmodels/taxdata（代码公共领域加 CC0，puf.csv 成品明确不对外分享）。
+
+### PolicyEngine US 与 Populace 微观数据
+- **内容：** 目前最活跃的开源美国税益规则引擎：联邦与各州所得税、工资税加主要福利项目，每条规则带法条出处和 YAML 测试。它也是 NBER 钦定的 TAXSIM 继任者，以及已终结的 OpenFisca US（旧仓库已不存在）的正统续作。
+- **下载：** https://github.com/PolicyEngine/policyengine-us （AGPL-3.0，170 star）；微观数据在 https://huggingface.co/datasets/policyengine/populace-us
+- **状态：** `已核实可下`。与 PUF 路线相反，它的人口微观数据 Populace 用公开 CPS 与 SCF 合成，非 gated、已有约 2.6 万次下载，没有协议墙。
+
+### NBER TAXSIM
+- **内容：** 学术界算历史税负的事实标准：联邦法 1960 至 2023、州法 1977 至 2021，含边际税率，底层是 FORTRAN。
+- **下载：** https://taxsim.nber.org/
+- **状态：** `部分可下`。使用免费免审（网页表单、文件上传、Stata 与 R 接口，可执行版可下到本地处理敏感数据），但源码不公开，也不自带微观数据。它是服务不是库。其继任者正与 PolicyEngine 合作开发，输入输出格式兼容。
+
+### FiscalSim-US 与耶鲁预算实验室模型
+- **内容：** 两个小字辈。FiscalSim-US（犹他州立大学增长与机会中心，脱胎于 PolicyEngine 早期代码，AGPL-3.0）覆盖联邦加州税与福利，是本节最静的一个，0 star。耶鲁预算实验室的 Tax-Simulator 与 Tax-Data（CRS 报告里与 Tax-Calculator 对比的另一位）毛病同 PUF：数据仓需要受限的 2015 年 IRS PUF 自备。
+- **下载：** https://github.com/rickecon/fiscalsim-us ，https://github.com/Budget-Lab-Yale
+- **状态：** `部分可下`。
+
 ## 已核查、不可下载
 
 | 基准 | 公开存在的只有 | 为什么下不了 |
@@ -224,6 +325,7 @@
 | CPA 考试题集 | 没找到合法开放的 | HF、GitHub、Kaggle、Zenodo 多路搜过，只有 Docsity、Stuvia 一类付费题库转卖站，来源与合法性不可验；不存在可合法开放下载的 AICPA 释放题数据集 |
 | BigLaw Bench 全集与 BigLaw Bench: Research（Harvey） | 公开样本、博客与排行榜 | 100 个 triplet 全集私有（要联系 Harvey）；2026 年的 Research 版 practice area 名单里确实有 Tax，但没有公开数据可下 |
 | Vals Legal Research Bench | 只有排行榜页，按 practice area 约 294 题 | 里面根本没有 Tax、Accounting、Audit 类别，任务数据也不公开 |
+| AAER 舞弊数据集（Dechow、Ge、Larson、Sloan） | 向研究者本人付费购买，另在商业库 Audit Analytics 里 | F-score 的底层数据（1982 至 2018 年 AAER）没有免费下载，Stanford GSB 图书馆指南写明向研究者购买；SEC 官网能逐份查 AAER 原文，但那是非结构化文本，不算数据集 |
 
 
 ## 核查方法

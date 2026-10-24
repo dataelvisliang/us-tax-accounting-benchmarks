@@ -2,7 +2,7 @@
 
 A field log of public benchmarks for evaluating AI agents on US tax and accounting work, with one hard rule: **an entry is only listed as downloadable after its actual dataset or repository page has been opened and checked.** Press releases and leaderboard pages do not count.
 
-Scope rule: a set is included if it **contains US tax, accounting, or audit material**. Mixed sets qualify when a US portion exists, and the entry says so; sets with no US content are excluded.
+Scope rule: a set is included if it **contains US tax, accounting, or audit material**. Mixed sets qualify when a US portion exists, and the entry says so; sets with no US content are excluded. A later section also logs raw materials and open tax engines: official bulk data, academic corpora, and microsimulation code that quietly serve as fixture and ground-truth infrastructure.
 
 Last verified: 2026-10-24. Status labels: `verified-downloadable`, `partial`, `not-downloadable`.
 
@@ -206,6 +206,107 @@ Sets built like Harvey LAB (one task package per item, work files, deliverables,
 - **What:** 112k+ financial tables from S&P 500 annual reports, with structure annotations.
 - **Status:** `partial` and borderline under the documents rule: what ships is cropped table-region images cut from report pages, not the original report documents. Original via IBM's data exchange (https://developer.ibm.com/data/fintabnet/, IBM account and agreement required, CDLA-Permissive-1.0); a cleaned version, FinTabNet.c, is directly downloadable on Hugging Face (bsmock/FinTabNet.c, CDLA-Permissive-2.0).
 
+## Raw materials and open engines (quiet infrastructure)
+
+Not benchmarks: the bulk data, corpora, and calculation engines that eval fixtures and ground truth get built from. Each was checked at its actual source page.
+
+### IRS Form 990 full e-file XML (IRS)
+- **What:** Every electronically filed Form 990, 990-EZ, and 990-PF with schedules since 2011, one XML per filing, millions of returns, monthly increments. Donor information is excluded and some identifiers are redacted. The old AWS public bucket was deprecated at the end of 2021; the IRS downloads page is the current channel.
+- **Download:** https://www.irs.gov/charities-non-profits/form-990-series-downloads
+- **Status:** `verified-downloadable`. Public by statute (IRC section 6104), no registration, no agreement. The complete ground-truth set for nonprofit financials and governance fields.
+
+### IRS EO Business Master File Extract
+- **What:** The master index of US exempt organizations: 1,975,975 records in the 13 Oct 2026 release, CSV split by state plus regional and international files. Fields cover EIN, legal and trade names, subsection and classification codes, ruling year, asset and income codes, filing requirement, and foundation status.
+- **Download:** https://www.irs.gov/charities-non-profits/exempt-organizations-business-master-file-extract-eo-bmf
+- **Status:** `verified-downloadable`. Free, monthly cumulative snapshot. The sampling frame and join key for anything built on 990 data.
+
+### IRS Statistics of Income, incl. the Synthetic Public Use File
+- **What:** Three tiers with very different gates. Aggregate tables (individual, corporate, exempt, estate, ZIP code, county) are free XLS/CSV downloads. The traditional individual Public Use File has been **withdrawn**; its replacement, the fully synthetic PUF (tax year 2016, built with the Urban Institute and Tax Policy Center), was released 21 Nov 2025, though the exact download page still needs pinning down. Exempt-organization SOI microdata samples (1985 to 2022, ASCII) remain free.
+- **Download:** https://www.irs.gov/statistics
+- **Status:** `partial`. Aggregates and EO microdata verified downloadable; the synthetic PUF release is confirmed by IRS announcement, its landing page is not yet pinned in this log.
+
+### SEC Financial Statement Data Sets and EDGAR bulk files
+- **What:** Structured XBRL financials as submitted: quarterly ZIPs from 2009 Q1 to 2026 Q3 (about 60 to 122 MB each) with submission, numeric, tag, and presentation tables, plus a notes variant with footnote text. Nightly bulk ZIPs carry every company's facts (companyfacts.zip) and every filer's submission history (submissions.zip). JSON APIs need no key; full-text search covers filings since 2001.
+- **Download:** https://www.sec.gov/dera/data/financial-statement-data-sets.html
+- **Status:** `verified-downloadable`. US government public domain; programmatic access must follow SEC fair access (identifying User-Agent, at most 10 requests per second). The sturdiest official ground truth for reported financial numbers.
+
+### Federal Audit Clearinghouse (GSA)
+- **What:** The structured home of US Single Audits: more than 40,000 audits a year since 1997, with findings, material weaknesses, questioned costs, and corrective action plans as queryable fields. The audit counterpart to the 990 corpus.
+- **Download:** https://www.fac.gov ; API at https://api.fac.gov
+- **Status:** `verified-downloadable`. Web search is open; the API needs a free api.data.gov key.
+
+### Treasury Fiscal Data
+- **What:** Federal receipts and outlays as official time series, including the Monthly Treasury Statement (receipts by source: individual, corporate, employment taxes; back to Oct 1980) and the Daily Treasury Statement.
+- **Download:** https://fiscaldata.treasury.gov (API needs no key)
+- **Status:** `verified-downloadable`. Public domain. Macro-level tax ground truth.
+
+### NCCS Core Files (Urban Institute) and ProPublica Nonprofit Explorer
+- **What:** Two cleaned routes into 990 data. NCCS Core Files integrate IRS return transaction files into panels with 60+ financial fields per organization, coverage from 1989 (ODC-BY, attribution required; historical files end in the mid-2010s, so recent years need the IRS XML). ProPublica's explorer covers about 1.9 million organizations and 18 million filings with a free keyless API plus bulk downloads of structured extracts, PDFs, and XML.
+- **Download:** https://datacatalog.urban.org/dataset/national-center-charitable-statistics-nccs-core-files ; https://projects.propublica.org/nonprofits/
+- **Status:** `verified-downloadable`. ProPublica's bulk file names were cross-confirmed from multiple sources rather than clicked through this pass; its API terms are confirmed.
+
+### Census state government tax collections
+- **What:** Annual collections for all 50 state governments across 25 tax categories, XLS and CSV back to 1951, plus an API time series.
+- **Download:** https://www.census.gov/programs-surveys/stc/data.html
+- **Status:** `verified-downloadable`. The API needs a free Census key. The official source for state-level tax statistics.
+
+### FiNER-139 (XBRL numeric entity annotations)
+- **What:** Token-level annotations of 139 common US GAAP XBRL tags over about 10,000 SEC filings (2016 to 2020), 1.11 million sentences, with train, validation, and test splits.
+- **Download:** https://huggingface.co/datasets/nlpaueb/finer-139 (CC BY-SA 4.0, not gated)
+- **Status:** `verified-downloadable`.
+
+### FNXL (extreme financial numeric labeling)
+- **What:** 79,088 sentences with 142,922 annotated numerals across 2,794 US GAAP tags and 840 companies, split by company to prevent leakage.
+- **Download:** https://huggingface.co/datasets/soummyaah/FNXL (not gated)
+- **Status:** `partial`. Neither the HF page nor the GitHub repo states a license, so clear the rights question before real use.
+
+### EDGAR-CORPUS (10-K full text)
+- **What:** Every 10-K from 1993 to 2020: 38,009 filings, about 6.5 billion tokens, JSON pre-split into the 20 standard 10-K items, about 10.9 GB by year.
+- **Download:** https://doi.org/10.5281/zenodo.5528490 (CC BY 4.0)
+- **Status:** `verified-downloadable`. The crawler toolkit is at github.com/nlpaueb/edgar-crawler.
+
+### MAEC (earnings call corpus)
+- **What:** 3,443 earnings calls from 1,213 S&P 1500 firms (2015 to 2018) with sentence-aligned transcripts and audio features. Transcripts plus low-level features (147.7 MB) are in the repo; high-level MFCC features (59 GB) sit behind a Google Drive link; raw audio is not included.
+- **Download:** https://github.com/Earnings-Call-Dataset/MAEC (CC BY-SA 4.0)
+- **Status:** `verified-downloadable` for the repo contents.
+
+### Harvard Dataverse quiet deposits (all CC0)
+- **SEC Financial as Reported** (https://doi.org/10.7910/DVN/REP5DJ): 20 quarterly JSON files, about 1.02 GB from 2010 Q1, as-reported financial statement data.
+- **10-K Item 1 MPNet embeddings** (https://doi.org/10.7910/DVN/Y79OCK): precomputed embeddings for the business section of every 10-K, 1994 to 2022; a 14 MB index plus a 1.88 GB embedding pack, about 1.94 GB total. Skips the embedding step for 10-K text experiments.
+- **Accounting Fraud** (https://doi.org/10.7910/DVN/5KLEXO): spreadsheets plus MATLAB CNN/LSTM fraud-detection code, 62.8 MB. The file list is verified; the sample composition was not row-checked, so inspect before citing.
+- Two small ones: an audit-features and suspected-fraud database (https://doi.org/10.7910/DVN/ACLNK7, 845 KB) and an audit committee and financial distress sheet (https://doi.org/10.7910/DVN/XRKASF, 19 KB).
+- **Status:** `verified-downloadable`. Structural note: most Dataverse tax deposits are code-only replication packages whose underlying IRS or Compustat data is restricted and not included.
+
+### US State and Local Tax Rates 1975-2022 (ICPSR)
+- **What:** State tax rates 1977 to 2022 and local rates aggregated to county for 2000 to 2022, covering individual income, corporate, property, sales, and excise taxes, sourced from NBER TAXSIM and state revenue departments.
+- **Download:** https://doi.org/10.3886/E208462V2 (CC BY 4.0, Public)
+- **Status:** `partial`. Downloading from ICPSR needs a free Researcher Passport account even for public sets. ICPSR's accounting and audit holdings are otherwise essentially empty.
+
+### Loughran-McDonald dictionary and journal replication notes
+- **What:** The Loughran-McDonald master dictionary (Notre Dame SRAF, updated Mar 2026, coverage 1993 to 2025) is the standard word list for financial text analysis, derived from the full EDGAR 10-K corpus; CSV and XLSX download directly. Terms: free for academic research, commercial use needs separate permission. Separately, the Journal of Accounting Research runs a central supplements page, but its terms restrict downloads to academic research with commercial use prohibited, and most packages are code and identifiers rather than data.
+- **Download:** https://sraf.nd.edu/loughranmcdonald-master-dictionary/
+- **Status:** `partial`. A research instrument, logged because accounting text evals keep reaching for it; respect the non-commercial term.
+
+### PSL Tax-Calculator
+- **What:** The Washington policy world's open static microsimulation model for federal individual income and payroll taxes, used by CRS, AEI, and the Tax Policy Center. The code is US public domain (GitHub shows it as Other).
+- **Download:** https://github.com/PSLmodels/Tax-Calculator (314 stars, actively maintained)
+- **Status:** `partial`, because the data splits three ways. The bundled CPS file (built from public Census survey data, precision limited by the authors' own note) ships in the package and runs with zero gate. The high-fidelity PUF file must be built by the user from the 2011 IRS Public Use File, which has to be obtained from SOI under its restrictions, and the newer TMD file likewise needs the 2015 PUF; neither finished file may be redistributed. Its data pipeline lives at github.com/PSLmodels/taxdata (public domain and CC0 code; finished puf.csv explicitly not shared).
+
+### PolicyEngine US and the Populace microdata
+- **What:** The most active open US tax and benefit rules engine: federal and state income taxes, payroll taxes, and major benefit programs, with every rule carrying statutory citations and YAML tests. It is also the line NBER names as TAXSIM's successor, and the continuation of the discontinued OpenFisca US (whose old repo is gone).
+- **Download:** https://github.com/PolicyEngine/policyengine-us (AGPL-3.0, 170 stars); microdata at https://huggingface.co/datasets/policyengine/populace-us
+- **Status:** `verified-downloadable`. Unlike the PUF route, its population microdata (Populace, synthesized from public CPS and SCF surveys, about 26,000 downloads, not gated) has no agreement wall.
+
+### NBER TAXSIM
+- **What:** The academic standard for historical US tax burdens: federal law 1960 to 2023 and state law 1977 to 2021, marginal rates included, FORTRAN under the hood.
+- **Download:** https://taxsim.nber.org/
+- **Status:** `partial`. Use is free and ungated (web form, file upload, Stata and R interfaces; executables can be downloaded for local runs on sensitive data), but the source code is not published and it ships no microdata. A service, not a library. A successor compatible with its inputs and outputs is being built with PolicyEngine.
+
+### FiscalSim-US and the Yale Budget Lab models
+- **What:** Two smaller engines. FiscalSim-US (Utah State's Center for Growth and Opportunity, forked from early PolicyEngine code, AGPL-3.0) covers federal plus state taxes and benefits and is the quietest entry in this section at 0 GitHub stars. Yale Budget Lab's Tax-Simulator and Tax-Data (the other model in CRS's comparison) share the PUF problem: their data repo needs the restricted 2015 IRS PUF.
+- **Download:** https://github.com/rickecon/fiscalsim-us ; https://github.com/Budget-Lab-Yale
+- **Status:** `partial`.
+
 ## Checked and not downloadable
 
 | Benchmark | What exists publicly | Why it is not downloadable |
@@ -224,6 +325,7 @@ Sets built like Harvey LAB (one task package per item, work files, deliverables,
 | CPA exam question sets | Nothing legitimate found | Searches across Hugging Face, GitHub, Kaggle, and Zenodo surfaced only paid question-bank resellers (Docsity, Stuvia) with unverifiable provenance; no openly licensed AICPA released-question set exists as a dataset |
 | BigLaw Bench full set and BigLaw Bench: Research (Harvey) | Public samples, a blog, and a leaderboard | The full 100-triplet set is private (contact Harvey); the 2026 Research edition does list a Tax practice area but publishes no downloadable data |
 | Vals Legal Research Bench | Leaderboard page only, about 294 questions by practice area | No Tax, Accounting, or Audit category exists in it, and task data is not public |
+| AAER fraud dataset (Dechow, Ge, Larson, Sloan) | Sold by the researchers; also inside commercial Audit Analytics | The F-score's underlying data (AAERs 1982 to 2018) has no free download; per Stanford GSB's library guide it is purchased from the researchers themselves. SEC posts individual AAER texts, but that is unstructured text, not a dataset |
 
 
 ## How entries get verified
